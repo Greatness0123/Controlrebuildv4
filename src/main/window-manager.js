@@ -76,9 +76,13 @@ class WindowManager {
 
         this.mainWindow.setIgnoreMouseEvents(!this.isInteractive, { forward: !this.isInteractive });
 
-        await this.mainWindow.loadFile(
-            path.join(__dirname, '../renderer/main-overlay.html')
-        );
+        if (isDev) {
+            await this.mainWindow.loadURL('http://localhost:5173/overlay.html');
+        } else {
+            await this.mainWindow.loadFile(
+                path.join(__dirname, '../../dist-renderer/overlay.html')
+            );
+        }
 
         this.windows.set('main', this.mainWindow);
         this.applyCurrentVisibility(this.mainWindow);
@@ -123,9 +127,13 @@ class WindowManager {
         chatWindow.setAlwaysOnTop(true, 'screen-saver')
 
         try {
-            await chatWindow.loadFile(
-                path.join(__dirname, '../renderer/chat-window.html')
-            );
+            if (isDev) {
+                await chatWindow.loadURL('http://localhost:5173/chat.html');
+            } else {
+                await chatWindow.loadFile(
+                    path.join(__dirname, '../../dist-renderer/chat.html')
+                );
+            }
             console.log('[WindowManager] Chat window loaded successfully');
         } catch (err) {
             console.error('[WindowManager] Failed to load chat window:', err);
@@ -181,9 +189,13 @@ class WindowManager {
         });
         settingsWindow.setAlwaysOnTop(true, 'screen-saver')
         try {
-            await settingsWindow.loadFile(
-                path.join(__dirname, '../renderer/settings-modal.html')
-            );
+            if (isDev) {
+                await settingsWindow.loadURL('http://localhost:5173/settings.html');
+            } else {
+                await settingsWindow.loadFile(
+                    path.join(__dirname, '../../dist-renderer/settings.html')
+                );
+            }
             console.log('[WindowManager] Settings window loaded successfully');
         } catch (err) {
             console.error('[WindowManager] Failed to load settings window:', err);
@@ -249,9 +261,13 @@ class WindowManager {
         workflowWindow.setAlwaysOnTop(true, 'screen-saver')
 
         try {
-            await workflowWindow.loadFile(
-                path.join(__dirname, '../renderer/workflow-window.html')
-            );
+            if (isDev) {
+                await workflowWindow.loadURL('http://localhost:5173/workflow.html');
+            } else {
+                await workflowWindow.loadFile(
+                    path.join(__dirname, '../../dist-renderer/workflow.html')
+                );
+            }
             console.log('[WindowManager] Workflow window loaded successfully');
         } catch (err) {
             console.error('[WindowManager] Failed to load workflow window:', err);
@@ -285,7 +301,11 @@ class WindowManager {
             }
         });
         liteWindow.setAlwaysOnTop(true, 'screen-saver');
-        await liteWindow.loadFile(path.join(__dirname, '../renderer/lite-window.html'));
+        if (isDev) {
+            await liteWindow.loadURL('http://localhost:5173/lite.html');
+        } else {
+            await liteWindow.loadFile(path.join(__dirname, '../../dist-renderer/lite.html'));
+        }
         this.windows.set('lite', liteWindow);
         this.applyCurrentVisibility(liteWindow);
         this.setupDraggableWindow(liteWindow);
@@ -322,9 +342,13 @@ class WindowManager {
         });
 
         try {
-            await entryWindow.loadFile(
-                path.join(__dirname, '../renderer/entry-window.html')
-            );
+            if (isDev) {
+                await entryWindow.loadURL('http://localhost:5173/entry.html');
+            } else {
+                await entryWindow.loadFile(
+                    path.join(__dirname, '../../dist-renderer/entry.html')
+                );
+            }
             console.log('[WindowManager] Entry window loaded successfully');
         } catch (err) {
             console.error('[WindowManager] Failed to load entry window:', err);
