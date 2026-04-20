@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-transparent text-gray-900 antialiased;
+  }
+}
+
+.dark {
+  @apply text-gray-100;
+}
