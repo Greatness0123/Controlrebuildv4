@@ -355,9 +355,14 @@ const ChatPage: React.FC = () => {
 
         {/* Current Active Actions */}
         <div className="flex flex-col gap-1">
-            {activeActions.map(action => (
-                <ActionCard key={action.id} action={action} />
-            ))}
+            {activeActions.length > 0 && (
+                <div className="relative py-2">
+                    <div className="absolute left-[0px] top-4 bottom-4 w-[1px] bg-neutral-800" />
+                    {activeActions.map(action => (
+                        <ActionCard key={action.id} action={action} />
+                    ))}
+                </div>
+            )}
         </div>
 
         <div ref={messagesEndRef} className="h-4" />
