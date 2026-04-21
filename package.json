@@ -5,7 +5,7 @@
   "main": "src/main/main.js",
   "homepage": "./",
   "scripts": {
-    "start": "electron .",
+    "start": "npm run build:renderer && cross-env NODE_ENV=production electron .",
     "dev": "vite & cross-env NODE_ENV=development electron .",
     "build:renderer": "vite build",
     "build": "electron-builder",

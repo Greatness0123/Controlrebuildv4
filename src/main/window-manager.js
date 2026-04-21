@@ -1,6 +1,5 @@
 const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
 
 app.disableHardwareAcceleration()
 
@@ -69,14 +68,14 @@ class WindowManager {
                 contextIsolation: true,
                 enableRemoteModule: false,
                 preload: path.join(__dirname, '../preload/main-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
         this.mainWindow.setAlwaysOnTop(true, 'floating')
 
         this.mainWindow.setIgnoreMouseEvents(!this.isInteractive, { forward: !this.isInteractive });
 
-        if (isDev) {
+        if (process.env.NODE_ENV === 'development') {
             await this.mainWindow.loadURL('http://localhost:5173/overlay.html');
         } else {
             await this.mainWindow.loadFile(
@@ -120,14 +119,14 @@ class WindowManager {
                 contextIsolation: true,
                 enableRemoteModule: false,
                 preload: path.join(__dirname, '../preload/chat-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
 
         chatWindow.setAlwaysOnTop(true, 'screen-saver')
 
         try {
-            if (isDev) {
+            if (process.env.NODE_ENV === 'development') {
                 await chatWindow.loadURL('http://localhost:5173/chat.html');
             } else {
                 await chatWindow.loadFile(
@@ -184,12 +183,12 @@ class WindowManager {
                 contextIsolation: true,
                 enableRemoteModule: false,
                 preload: path.join(__dirname, '../preload/settings-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
         settingsWindow.setAlwaysOnTop(true, 'screen-saver')
         try {
-            if (isDev) {
+            if (process.env.NODE_ENV === 'development') {
                 await settingsWindow.loadURL('http://localhost:5173/settings.html');
             } else {
                 await settingsWindow.loadFile(
@@ -254,14 +253,14 @@ class WindowManager {
                 contextIsolation: true,
                 enableRemoteModule: false,
                 preload: path.join(__dirname, '../preload/workflow-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
 
         workflowWindow.setAlwaysOnTop(true, 'screen-saver')
 
         try {
-            if (isDev) {
+            if (process.env.NODE_ENV === 'development') {
                 await workflowWindow.loadURL('http://localhost:5173/workflow.html');
             } else {
                 await workflowWindow.loadFile(
@@ -297,11 +296,11 @@ class WindowManager {
                 nodeIntegration: false,
                 contextIsolation: true,
                 preload: path.join(__dirname, '../preload/lite-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
         liteWindow.setAlwaysOnTop(true, 'screen-saver');
-        if (isDev) {
+        if (process.env.NODE_ENV === 'development') {
             await liteWindow.loadURL('http://localhost:5173/lite.html');
         } else {
             await liteWindow.loadFile(path.join(__dirname, '../../dist-renderer/lite.html'));
@@ -337,12 +336,12 @@ class WindowManager {
                 contextIsolation: true,
                 enableRemoteModule: false,
                 preload: path.join(__dirname, '../preload/entry-preload.js'),
-                webSecurity: !isDev
+                webSecurity: process.env.NODE_ENV !== 'development'
             }
         });
 
         try {
-            if (isDev) {
+            if (process.env.NODE_ENV === 'development') {
                 await entryWindow.loadURL('http://localhost:5173/entry.html');
             } else {
                 await entryWindow.loadFile(
