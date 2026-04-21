@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./src/renderer-react/index.html",
-    "./src/renderer-react/**/*.{js,ts,jsx,tsx}",
+    "./src/renderer/index.html",
+    "./src/renderer/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
