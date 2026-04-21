@@ -26,6 +26,7 @@ const ChatPage: React.FC = () => {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [status, setStatus] = useState({ text: 'Ready', type: 'ready' });
   const [isWelcomeVisible, setIsWelcomeVisible] = useState(true);
+  const [greeting, setGreeting] = useState('Control');
 
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [activeActions, setActiveActions] = useState<ActionStatus[]>([]);
@@ -34,6 +35,17 @@ const ChatPage: React.FC = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    const triggerInitial = async () => {
+      if (window.chatAPI) {
+        const s = await window.chatAPI.getSettings();
+        const u = s?.userDetails?.firstName || s?.userDetails?.name;
+        setGreeting(getDynamicGreeting(u));
+      } else {
+        // Fallback for development/testing outside Electron
+        setGreeting(getDynamicGreeting());
+      }
+    };
+    triggerInitial();
     const init = async () => {
       if (window.chatAPI) {
         window.chatAPI.onAIResponse((_, data) => {
@@ -82,8 +94,24 @@ const ChatPage: React.FC = () => {
         window.chatAPI.onAudioStarted(() => setIsAudioPlaying(true));
         window.chatAPI.onAudioStopped(() => setIsAudioPlaying(false));
 
-        window.chatAPI.onAppInitialized(() => {
-            // maybe speak greeting
+        window.chatAPI.onAppInitialized(async () => {
+            const initialSettings = await window.chatAPI.getSettings();
+            const userName = initialSettings?.userDetails?.firstName || initialSettings?.userDetails?.name;
+            const dynamicGreeting = getDynamicGreeting(userName);
+            setGreeting(dynamicGreeting);
+
+            // TTS logic for greeting
+            try {
+              const isLocked = await window.chatAPI.isAppLocked?.();
+              if (isLocked && isLocked.locked) return;
+
+              const result = await window.chatAPI.shouldSpeakGreeting();
+              if (result && result.shouldSpeak) {
+                  window.chatAPI.speakGreeting(dynamicGreeting);
+              }
+            } catch (err) {
+              console.error('Error checking greeting TTS setting:', err);
+            }
         });
       }
     };
@@ -102,6 +130,12 @@ const ChatPage: React.FC = () => {
   }, [currentTask]);
 
   useEffect(() => {
+    const triggerInitial = async () => {
+      const s = await window.chatAPI.getSettings();
+      const u = s?.userDetails?.firstName || s?.userDetails?.name;
+      setGreeting(getDynamicGreeting(u));
+    };
+    triggerInitial();
     scrollToBottom();
   }, [messages, activeActions]);
 
@@ -198,6 +232,46 @@ const ChatPage: React.FC = () => {
     }
   };
 
+  const getDynamicGreeting = (userName?: string) => {
+    const hour = new Date().getHours();
+    const simpleGreetings = [
+        "I'm ready when you are",
+        "How are you?",
+        "let's begin",
+        "let's continue",
+        "Ready to help",
+        "What's the plan?",
+        "Let's get to work"
+    ];
+
+    let greetingText = "";
+    const useTimeBased = Math.random() > 0.4;
+
+    if (useTimeBased) {
+        if (hour >= 5 && hour < 12) {
+            greetingText = Math.random() > 0.5 ? "Good morning" : "How was your night?";
+        } else if (hour >= 12 && hour < 17) {
+            greetingText = "Good afternoon";
+        } else if (hour >= 17 && hour < 22) {
+            greetingText = "Good evening";
+        } else {
+            greetingText = Math.random() > 0.5 ? "Aren't you going to sleep?" : "No sleep?";
+        }
+    } else {
+        greetingText = simpleGreetings[Math.floor(Math.random() * simpleGreetings.length)];
+    }
+
+    if (userName) {
+        if (greetingText.endsWith("?")) {
+            return `${userName}, ${greetingText.toLowerCase()}`;
+        } else {
+            return `${greetingText}, ${userName}!`;
+        }
+    } else {
+        return greetingText.endsWith("?") ? greetingText : `${greetingText}!`;
+    }
+  };
+
   const toggleRecording = () => {
       setIsRecording(!isRecording);
   };
@@ -261,7 +335,7 @@ const ChatPage: React.FC = () => {
                     transition={{ delay: 0.1 }}
                     className="text-2xl font-black tracking-tighter"
                 >
-                    CONTROL
+                    {greeting}
                 </motion.h2>
                 <motion.p
                     initial={{ y: 10, opacity: 0 }}
